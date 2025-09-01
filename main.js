@@ -13,29 +13,40 @@ function injectFont() {
 async function renderCarousel() {
   injectFont();
 
-  fetch(PRODUCTS_URL)
-  .then(response => response.json())
-  .then(data => {
-    createCarousel(data);
-  });
+  const localStorageItems = localStorage.getItem(STORAGE_KEY);
+
+  if (localStorageItems) {
+    createCarousel(JSON.parse(localStorageItems))
+  } else {
+    fetch(PRODUCTS_URL)
+    .then(response => response.json())
+    .then(data => {
+      createCarousel(data);
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    });
+  }
 }
 
-/*   
-let products = [];
+/*
+async function loadProducts() {
+  let products = [];
+  const cached = localStorage.getItem(STORAGE_KEY);
 
-const cached = localStorage.getItem(STORAGE_KEY);
-
-if (cached) {
-  products = JSON.parse(cached);
+  if (cached) {
+    products = JSON.parse(cached);
   } else {
     const response = await fetch(PRODUCTS_URL);
     products = await response.json();
     localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }  
-  */
+  }
+  return products;
+}
+*/
  
  function createCarousel(products) {
- localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+
+  let localStorageItems = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {};  
 
   const container = document.createElement("div");
   container.className = "custom-carousel";
@@ -47,7 +58,7 @@ if (cached) {
   const list = document.createElement("div");
   list.className = "carousel-list";
 
-  products.forEach(product => {
+  products.forEach((product, index) => {
     const item = document.createElement("div");
     item.className = "carousel-item";
 
@@ -66,7 +77,7 @@ if (cached) {
     price.textContent = product.price + " TRY";
 
     const heart = document.createElement("i");
-    heart.className = "fa-regular fa-heart heart-icon";
+    heart.className = localStorageItems[index]?.wishlish ? "fa-heart heart-icon fa-solid active" : "fa-regular fa-heart heart-icon";
 
     item.appendChild(img);
     item.appendChild(name);
@@ -78,11 +89,20 @@ if (cached) {
   container.appendChild(list);
   
   const hearts = list.querySelectorAll(".heart-icon");
-  hearts.forEach(heart => {
+  hearts.forEach((heart, index) => {    
     heart.addEventListener("click", () => {
-    heart.classList.toggle("active");  
-    heart.classList.toggle("fa-regular");
-    heart.classList.toggle("fa-solid");
+      
+      if (localStorageItems[index]?.wishlish) {
+        localStorageItems[index].wishlish = false;
+      } else {
+        localStorageItems[index].wishlish = true;
+      }
+      
+      heart.classList.toggle("active");  
+      heart.classList.toggle("fa-regular");
+      heart.classList.toggle("fa-solid");
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(localStorageItems));
     });
   });
 
