@@ -27,14 +27,16 @@ const cached = localStorage.getItem(STORAGE_KEY);
 
 if (cached) {
   products = JSON.parse(cached);
-} else {
-  const response = await fetch(PRODUCTS_URL);
-  products = await response.json();
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-} 
-*/
+  } else {
+    const response = await fetch(PRODUCTS_URL);
+    products = await response.json();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
+  }  
+  */
+ 
+ function createCarousel(products) {
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
 
-function createCarousel(products) {
   const container = document.createElement("div");
   container.className = "custom-carousel";
 
@@ -74,8 +76,7 @@ function createCarousel(products) {
   });
 
   container.appendChild(list);
-
-  // kalpler DOM'a eklendikten sonra
+  
   const hearts = list.querySelectorAll(".heart-icon");
   hearts.forEach(heart => {
     heart.addEventListener("click", () => {
@@ -108,6 +109,7 @@ function createCarousel(products) {
   const firstCard = list.querySelector(".carousel-item");
   const cardStyle = window.getComputedStyle(firstCard);
   const cardWidth = firstCard.offsetWidth + parseInt(cardStyle.marginRight);
+  // offsetWidth = içerik + padding + border genişliği
   const scrollAmount = cardWidth;
 
   nextBtn.addEventListener("click", () => {
