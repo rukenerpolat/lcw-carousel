@@ -77,7 +77,7 @@ async function loadProducts() {
     price.textContent = product.price + " TRY";
 
     const heart = document.createElement("i");
-    heart.className = localStorageItems[index]?.wishlish ? "fa-heart heart-icon fa-solid active" : "fa-regular fa-heart heart-icon";
+    heart.className = localStorageItems[index]?.wishlist ? "fa-heart heart-icon fa-solid active" : "fa-regular fa-heart heart-icon";
 
     item.appendChild(img);
     item.appendChild(name);
@@ -92,10 +92,10 @@ async function loadProducts() {
   hearts.forEach((heart, index) => {    
     heart.addEventListener("click", () => {
       
-      if (localStorageItems[index]?.wishlish) {
-        localStorageItems[index].wishlish = false;
+      if (localStorageItems[index]?.wishlist) {
+        localStorageItems[index].wishlist = false;
       } else {
-        localStorageItems[index].wishlish = true;
+        localStorageItems[index].wishlist = true;
       }
       
       heart.classList.toggle("active");  
