@@ -36,21 +36,23 @@ loadjQuery(function () {
       text-align: center;
       margin-bottom: 30px;
     }
+
     .custom-carousel {
-      background-color: #f5f5f5;
       padding: 0 60px;
       position: relative;
       overflow: hidden;
       margin: 20px auto;
       max-width: 1400px;
     }
+
     .custom-carousel h2 {
       font-size: 30px;
-      letter-spacing: 3px;
+      letter-spacing: 1px;
       margin-bottom: 20px;
-      font-weight: 500;
+      font-weight: 300;
       padding-top: 20px;
     }
+
     .carousel-list {
       display: flex;
       gap: 15px;
@@ -59,47 +61,43 @@ loadjQuery(function () {
       scroll-behavior: smooth;
       scrollbar-width: none; 
     }
+
     .carousel-list::-webkit-scrollbar {
       display: none;
     }
+
     .carousel-item {
       flex: 0 0 auto;
-      background-color: white;
+      background-color: #fff;
       position: relative;
       width: 200px;
-      height: 400px;
-      border-radius: 8px;
+      height: 380px;
       overflow: hidden;
       box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
+
     .carousel-item img {
       width: 100%;
       height: 250px;
       object-fit: cover;
       cursor: pointer;
-      transition: transform 0.3s;
     }
+
     .carousel-item p {
-      margin: 5px 0;
+      margin: 0;
       padding: 10px;
       font-size: 14px;
       text-align: left;
     }
-    .carousel-item .product-name {
-      height: 60px;
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
+
     .price {
       color: #193DB0;
       font-weight: bold;
       position: absolute;
-      bottom: 10px;
-      left: 10px;
+      bottom: 8px;
       font-size: 16px;
     }
+
     .heart-icon {
       color: #999;
       background-color: #f5f5f5;
@@ -118,13 +116,16 @@ loadjQuery(function () {
       align-items: center;
       justify-content: center;
     }
+
     .heart-icon:hover {
       transform: scale(1.1);
     }
+
     .heart-icon.active {
       color: #193DB0;
       background-color: white;
     }
+
     .prev, .next {
       position: absolute;
       top: 50%;
@@ -142,12 +143,15 @@ loadjQuery(function () {
       justify-content: center;
       transition: all 0.3s;
     }
+
     .prev:hover, .next:hover {
       transform: translateY(-50%) scale(1.1);
     }
+
     .prev {
       left: 15px;
     }
+
     .next {
       right: 15px;
     }
@@ -220,7 +224,7 @@ loadjQuery(function () {
         scrollLeft: carouselList.scrollLeft() + scrollAmount,
       },300);
     });
-    
+
     $('.prev')
     .off('click')
     .on('click', function () {
