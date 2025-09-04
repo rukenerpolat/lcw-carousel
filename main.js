@@ -1,250 +1,292 @@
-const PRODUCTS_URL = "https://gist.githubusercontent.com/sevindi/5765c5812bbc8238a38b3cf52f233651/raw/56261d81af8561bf0a7cf692fe572f9e1e91f372/products.json";
-const STORAGE_KEY = "carouselProducts";
-
-function injectFont() {
-  if (document.getElementById("nunito-font")) return;
-  const link = document.createElement("link");
-  link.id = "nunito-font";
-  link.rel = "stylesheet";
-  link.href = "https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap";
-  document.head.appendChild(link);
+function loadjQuery(callback) {
+    if (window.jQuery) {
+        callback();
+    } else {
+        var script = document.createElement('script');
+        script.src = "https://code.jquery.com/jquery-3.7.1.min.js";
+        script.onload = callback;
+        document.head.appendChild(script);
+    }
 }
 
-async function renderCarousel() {
-  injectFont();
+loadjQuery(function () {
+    $('body').empty();
 
-  const localStorageItems = localStorage.getItem(STORAGE_KEY);
+    $('head').append(
+        '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">'
+    );
 
-  if (localStorageItems) {
-    createCarousel(JSON.parse(localStorageItems))
-  } else {
-    fetch(PRODUCTS_URL)
-    .then(response => response.json())
-    .then(data => {
-      createCarousel(data);
+    $('head').append(
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap">'
+    );
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    });
-  }
-}
+    var styles = `
+    <style>  
+        body {
+            font-family: "Nunito Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
 
-/*
-async function loadProducts() {
-  let products = [];
-  const cached = localStorage.getItem(STORAGE_KEY);
+        .product-detail h1 {
+            color: #193DB0;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            text-align: center;
+        }
 
-  if (cached) {
-    products = JSON.parse(cached);
-  } else {
-    const response = await fetch(PRODUCTS_URL);
-    products = await response.json();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-  }
-  return products;
-}
-*/
- 
- function createCarousel(products) {
+        .product-detail p {
+            font-size: 1.2em;
+            color: #999;
+            text-align: center;
+            margin-bottom: 30px;
+        }
 
-  let localStorageItems = JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {};  
+        .custom-carousel {
+            background-color: #f5f5f5;
+            padding: 0 60px;
+            position: relative;
+            overflow: hidden;
+            margin: 20px auto;
+            max-width: 1400px;
+        }
 
-  const container = document.createElement("div");
-  container.className = "custom-carousel";
+        .custom-carousel h2 {
+            font-size: 30px;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            padding-top: 20px;
+        }
 
-  const title = document.createElement("h2");
-  title.textContent = "Benzer Ürünler";
-  container.appendChild(title);
+        .carousel-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 0 20px 0;
+            scroll-behavior: smooth;
+            scrollbar-width: none; 
+        }
 
-  const list = document.createElement("div");
-  list.className = "carousel-list";
+        .carousel-list::-webkit-scrollbar {
+            display: none;
+        }
 
-  products.forEach((product, index) => {
-    const item = document.createElement("div");
-    item.className = "carousel-item";
+        .carousel-item {
+            flex: 0 0 auto;
+            background-color: white;
+            position: relative;
+            width: 200px;
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
 
-    const img = document.createElement("img");
-    img.src = product.img;
-    img.alt = product.name;
-    img.addEventListener("click", () => {
-      window.open(product.url, "_blank");
-    });
+        .carousel-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
 
-    const name = document.createElement("p");
-    name.textContent = product.name;
+        .carousel-item img:hover {
+            transform: scale(1.05);
+        }
 
-    const price = document.createElement("p");
-    price.className = "price";
-    price.textContent = product.price + " TRY";
+        .carousel-item p {
+            margin: 5px 0;
+            padding: 10px;
+            font-size: 14px;
+            text-align: left;
+        }
 
-    const heart = document.createElement("i");
-    heart.className = localStorageItems[index]?.wishlist ? "fa-heart heart-icon fa-solid active" : "fa-regular fa-heart heart-icon";
+        .carousel-item .product-name {
+            height: 60px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
 
-    item.appendChild(img);
-    item.appendChild(name);
-    item.appendChild(price);
-    item.appendChild(heart);
-    list.appendChild(item);
-  });
+        .price {
+            color: #193DB0;
+            font-weight: bold;
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 16px;
+        }
 
-  container.appendChild(list);
-  
-  const hearts = list.querySelectorAll(".heart-icon");
-  hearts.forEach((heart, index) => {    
-    heart.addEventListener("click", () => {
-      
-      if (localStorageItems[index]?.wishlist) {
-        localStorageItems[index].wishlist = false;
-      } else {
-        localStorageItems[index].wishlist = true;
-      }
-      
-      heart.classList.toggle("active");  
-      heart.classList.toggle("fa-regular");
-      heart.classList.toggle("fa-solid");
+        .heart-icon {
+            color: #999;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;      
+            box-shadow: 0 6px 12px rgba(0, 0, 0, .09);
+            border-radius: 5px;
+            font-size: 20px;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(localStorageItems));
-    });
-  });
+        .heart-icon:hover {
+            background-color: white;
+            transform: scale(1.1);
+        }
 
-  const prevBtn = document.createElement("button");
-  prevBtn.className = "prev";
-  prevBtn.textContent = "❮";
+        .heart-icon.active {
+            color: #193DB0;
+            background-color: white;
+        }
 
-  const nextBtn = document.createElement("button");
-  nextBtn.className = "next";
-  nextBtn.textContent = "❯";
+        .prev, .next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #000;
+            background: transparent;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
 
-  container.appendChild(prevBtn);
-  container.appendChild(nextBtn);
+        .prev:hover, .next:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
 
-  injectStyles();
+        .prev {
+            left: 15px;
+        }
 
-  const productDetail = document.querySelector(".product-detail");
-  if (productDetail) {
-    productDetail.insertAdjacentElement("afterend", container);
-  } else {
-    document.body.appendChild(container);
-  }
+        .next {
+            right: 15px;
+        }
 
-  const firstCard = list.querySelector(".carousel-item");
-  const cardStyle = window.getComputedStyle(firstCard);
-  const cardWidth = firstCard.offsetWidth + parseInt(cardStyle.marginRight);
-  // offsetWidth = içerik + padding + border genişliği
-  const scrollAmount = cardWidth;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            font-size: 18px;
+            color: #999;
+        }
+    </style>`;
+    $('head').append(styles);
 
-  nextBtn.addEventListener("click", () => {
-    list.scrollBy({ left: scrollAmount, behavior: "smooth" });
-  });
+    $('body').append('<div class="product-detail"></div>');
 
-  prevBtn.addEventListener("click", () => {
-    list.scrollBy({ left: -scrollAmount, behavior: "smooth" });
-  });
-}
+    // API URL
+    var apiUrl ='https://gist.githubusercontent.com/sevindi/5765c5812bbc8238a38b3cf52f233651/raw/56261d81af8561bf0a7cf692fe572f9e1e91f372/products.json';
 
-function injectStyles() {
-  if (document.getElementById("carousel-styles")) return;
-  const style = document.createElement("style");
-  style.id = "carousel-styles";
-  style.textContent = `
-    .custom-carousel {
-      font-family: "Nunito Sans", sans-serif;
-      margin: 0 auto;
-      width: 1400px;
-      background-color: #f5f5f5;
-      padding: 0 60px;
-      position: relative;
-      overflow: hidden;
+    // favorites from localStorage
+    var savedFavorites = localStorage.getItem('favorites');
+    var favorites = savedFavorites ? JSON.parse(savedFavorites) : {};
+
+    function createProductCards(products) {
+        return `
+        <div class="custom-carousel">
+            <h2>Benzer Ürünler</h2>
+            <div class="carousel-list">
+                ${products.map((product, i) => {
+                    const isFavorite = favorites[i] && favorites[i].wishlist;
+                    const heartClass = isFavorite ? 'fa-solid fa-heart heart-icon active' : 'fa-regular fa-heart heart-icon';
+                    return `
+                        <div class="carousel-item">
+                            <img src="${product.img}" alt="${product.name}" data-url="${product.url}">
+                            <i class="${heartClass}" data-index="${i}"></i>
+                            <p class="product-name">${product.name}</p>
+                            <p class="price">${product.price} TRY</p>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            <button class="prev">❮</button>
+            <button class="next">❯</button>
+        </div>
+    `;
     }
 
-    .custom-carousel h2 {
-      font-size: 30px;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
-      font-weight: 500;
+    function bindEvents() {
+        $('.carousel-item img')
+            .off('click')
+            .on('click', function () {
+                var url = $(this).data('url');
+                window.open(url, '_blank');
+            });
+
+        $('.heart-icon')
+            .off('click')
+            .on('click', function () {
+                var index = $(this).data('index');
+
+                if (!favorites[index]) {
+                    favorites[index] = {};
+                }
+                favorites[index].wishlist = !favorites[index].wishlist;
+
+                localStorage.setItem('favorites', JSON.stringify(favorites));
+
+                $(this).toggleClass('active fa-regular fa-solid');
+            });
+
+        var scrollAmount = 215; // 200px card + 15px gap
+        var carouselList = $('.carousel-list');
+
+        $('.next')
+            .off('click')
+            .on('click', function () {
+                carouselList.animate(
+                    {
+                        scrollLeft: carouselList.scrollLeft() + scrollAmount,
+                    },
+                    300
+                );
+            });
+
+        $('.prev')
+            .off('click')
+            .on('click', function () {
+                carouselList.animate(
+                    {
+                        scrollLeft: carouselList.scrollLeft() - scrollAmount,
+                    },
+                    300
+                );
+            });
     }
 
-    .carousel-list {
-      display: flex;
-      gap: 15px;
-      overflow-x: auto;
-      padding: 10px 0;
-      scroll-behavior: smooth;
-      scrollbar-width: none; 
+    function createCarousel() {
+        $.ajax({
+            url: apiUrl,
+            method: 'GET',
+            dataType: 'json',
+            success: function (products) {
+                $('.custom-carousel').remove();
+
+                var carouselHtml = createProductCards(products);
+                $('.product-detail').after(carouselHtml);
+
+                bindEvents();
+            }
+        });
     }
 
-    .carousel-item {
-      flex: 0 0 auto;
-      background-color: white;
-      position: relative;
-      width: 200px;
-      height: 400px;
-    }
-
-    .carousel-item img {
-      width: 100%;
-      cursor: pointer;
-    }
-
-    .carousel-item p {
-      margin: 5px 0;
-      padding: 10px;
-      font-size: 1em;
-      text-align: left;
-    }
-
-    .price {
-      color: #193DB0;
-      font-weight: bold;
-      position: absolute;
-      bottom: 1px;
-      left: 2px;
-    }
-
-    .heart-icon {
-      color: #999;
-      background-color: #f5f5f5;
-      border: 1px solid #ddd;      
-      box-shadow: 0 6px 12px rgba(0, 0, 0, .09);
-      border-radius: 5px;
-      font-size: 20px;
-      position: absolute;
-      top: 8px;
-      right: 8px;
-      cursor: pointer;
-      padding: 5px;
-      transition: color 0.3s;
-    }
-
-    .heart-icon.active {
-      color: #193DB0;       
-    }
-
-    .prev, .next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #000;
-      background: transparent;
-      border: none;
-      font-size: 1.5em;
-      cursor: pointer;
-      z-index: 10;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .prev {
-      left: 10px;
-    }
-
-    .next {
-      right: 10px;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-renderCarousel();
+    createCarousel();
+});
