@@ -141,11 +141,6 @@ loadjQuery(function () {
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s;
-    }
-
-    .prev:hover, .next:hover {
-      transform: translateY(-50%) scale(1.1);
     }
 
     .prev {
@@ -222,7 +217,7 @@ loadjQuery(function () {
     .on('click', function () {
       carouselList.animate({
         scrollLeft: carouselList.scrollLeft() + scrollAmount,
-      },300);
+      },200);
     });
 
     $('.prev')
@@ -230,7 +225,7 @@ loadjQuery(function () {
     .on('click', function () {
       carouselList.animate({
         scrollLeft: carouselList.scrollLeft() - scrollAmount,
-      },300);
+      },200);
     });
   }
 
